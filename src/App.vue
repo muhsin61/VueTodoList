@@ -3,18 +3,25 @@
     <h1>#todo</h1>
     <div class="center">
       <div class="header">
-        <li class="firstLi" @click="handleClick(65)">All</li>
-        <li class="firstLi" @click="handleClick(213)">Active</li>
+        <li class="firstLi" @click="handleClick(55)">All</li>
+        <li class="firstLi" @click="handleClick(202)">Active</li>
         <li class="firstLi" @click="handleClick(386)">Complated</li>
       </div>
-      
     </div>
-    <div class="cizgi" ><div :style="{ left: hiza + 'px' }" class="cizgidiv"></div></div>
-    <div class="bos"></div>
-    <Add v-if="hiza<214" @handleAdd="handleAdd" />
-    <All v-if="hiza===65" @changeKey="changeKey" :datas="datas"/>
-    <Active v-if="hiza===213" @changeKey="changeKey" :datas="datas"/>
-    <Complated v-if="hiza===386" @changeKey="changeKey" @deletes="deletes" @deleteAll="deleteAll" :datas="datas"/>
+    <div class="line">
+      <div :style="{ left: linage + 'px' }" class="linediv"></div>
+    </div>
+    <div class="lineEmptyDiv"></div>
+    <Add v-if="linage < 214" @handleAdd="handleAdd" />
+    <All v-if="linage === 55" @changeStatus="changeStatus" :datas="datas" />
+    <Active v-if="linage === 202" @changeStatus="changeStatus" :datas="datas" />
+    <Complated
+      v-if="linage === 386"
+      @changeStatus="changeStatus"
+      @deletes="deletes"
+      @deleteAll="deleteAll"
+      :datas="datas"
+    />
   </div>
 </template>
 
@@ -30,128 +37,120 @@ export default {
     Add,
     All,
     Active,
-    Complated
+    Complated,
   },
-  created: function () {
-    if(localStorage.getItem("todos")){
-      console.log("todos var")
-      let actives = JSON.parse(localStorage.getItem("todos"))
-      actives.forEach(item=>{
-      console.log("item0" + item.muhsin)
-      if(item!=""){this.datas.push({key:Math.random(),todo:item.todo,active:item.active})}
-    })
-    }else{
+  created: function() {
+    if (localStorage.getItem("todos")) {
+      let actives = JSON.parse(localStorage.getItem("todos"));
+      actives.forEach((item) => {
+        if (item != "") {
+          this.datas.push({
+            key: Math.random(),
+            todo: item.todo,
+            active: item.active,
+          });
+        }
+      });
+    } else {
       const todos = [];
-      localStorage.setItem("todos",todos)
-      console.log("todos" + localStorage.getItem("todos"))
+      localStorage.setItem("todos", todos);
+      console.log("todos" + localStorage.getItem("todos"));
     }
-    
   },
   data() {
     return {
-      hiza: 65,
+      linage: 55,
       datas: [
-        { key: 1, todo: "bla bla bla", active: true },
-        { key: 2, todo: "bla bla bla", active: false },
-        { key: 3, todo: "deniisk", active: true }
-      ]
+      ],
     };
   },
   methods: {
-    handleClick(sira) {
-      this.hiza = sira;
+    handleClick(linage) {
+      this.linage = linage;
     },
-    handleAdd(add){
+    handleAdd(add) {
       let vat = true;
-      console.log("addtype: " + typeof(add))
-      this.datas.forEach(item=>{
-        if(item.todo === add){
-          console.log("aynı var")
+      console.log("addtype: " + typeof add);
+      this.datas.forEach((item) => {
+        if (item.todo === add) {
+          console.log("aynı var");
           vat = false;
         }
-      })
-        if(vat){
-          this.datas.push({key:Math.random(),todo:add,active:true})
-        }
-        let adds;
-        if((localStorage.getItem("todos"))){
-            let ekle = JSON.parse(localStorage.getItem("todos"))
-            ekle.forEach(item=>{
-              if(item.todo != add){
-                ekle.push({"todo":add,"active":true})
-                
-              }//hatayı düzelt
-              
-            })
-            ekle = JSON.stringify(ekle)
-            localStorage.setItem("todos",ekle)
-        }else{
-          adds=([{"todo":add,"active":true}])
-          localStorage.setItem("todos",JSON.stringify(adds))
-        }
+      });
+      if (vat) {
+        this.datas.push({ key: Math.random(), todo: add, active: true });
+      }
+      let adds;
+      if (localStorage.getItem("todos") && localStorage.getItem("todos") != "[]") {
+        adds = JSON.parse(localStorage.getItem("todos"));
+        adds.forEach((item) => {
+          if (item.todo != add) {
+            adds.push({ todo: add, active: true });
+          } 
+        });
+        adds = JSON.stringify(adds);
+        localStorage.setItem("todos", adds);
+      } else {
+        adds = [{ todo: add, active: true }];
+        localStorage.setItem("todos", JSON.stringify(adds));
+      }
     },
-    changeKey(id){
-      let todo = JSON.parse(localStorage.getItem("todos"))
-      let change = []
-      this.datas.forEach(item => {
-        console.log("item: " +  item)
-        if(item.key==id){
+    changeStatus(id) {
+      let todo = JSON.parse(localStorage.getItem("todos"));
+      let change = [];
+      this.datas.forEach((item) => {
+        console.log("item: " + item);
+        if (item.key == id) {
           item.active = !item.active;
-          console.log(  "length"+todo.length)
-              todo.forEach(td => {
-              if(item.todo == td.todo){
-                console.log(" 1 tdactive...." + td.active)
-                td.active = !td.active;
-                console.log(" 2 tdactive...." + td.active)
-                console.log("td: "+td)
-                change.push(td)
-              }
-              else{
-                change.push(td)
-              }
-            })
-         }
-        });
-        localStorage.setItem("todos",JSON.stringify(change))
+          todo.forEach((td) => {
+            if (item.todo == td.todo) {
+              td.active = !td.active;
+              change.push(td);
+            } else {
+              change.push(td);
+            }
+          });
+        }
+      });
+      localStorage.setItem("todos", JSON.stringify(change));
     },
-    deletes(id){
-      let copy = this.datas
-      this.datas = []
-      let todolar = []
-      copy.forEach(item => {
-        if(item.key!=id){this.datas.push(item)}
-        else{
-          let todos = JSON.parse(localStorage.getItem("todos"))
-          todos.forEach(toDo=>{
-            console.log(" 3 çalışıyor " + toDo.todo)
-            console.log(" 3.5 çalışıyor localstorage " + toDo)
-            if(toDo.todo !== item.todo){
-              console.log(" 4 çalışıyor1 " + item.todo)
-              todolar.push(toDo)
-              console.log(" 5 todolar: " + todolar)
-              console.log(" 6 todolar: " + JSON.stringify(todolar))
-              }
-          })
-          localStorage.setItem("todos",JSON.stringify(todolar))
-          console.log(" 7 todolar: " + todolar)}
-        });
+    deletes(id) {
+      let copy = this.datas;
+      this.datas = [];
+      let todolar = [];
+      copy.forEach((item) => {
+        if (item.key != id) {
+          this.datas.push(item);
+        } else {
+          let todos = JSON.parse(localStorage.getItem("todos"));
+          todos.forEach((toDo) => {
+            if (toDo.todo !== item.todo) {
+              todolar.push(toDo);
+            }
+          });
+          localStorage.setItem("todos", JSON.stringify(todolar));
+          console.log(" 7 todolar: " + todolar);
+        }
+      });
     },
-    deleteAll(){
-      let copy = this.datas
-      this.datas = []
-      let dltodo=[]
-      const todos = JSON.parse(localStorage.getItem("todos"))
-      todos.forEach(item=>{
-          if(item.active){
-            dltodo.push(item)
-          }
-      })
-      localStorage.setItem("todos",JSON.stringify(dltodo))
-      copy.forEach(item => {
-        if(item.active){this.datas.push(item)}
-        });
-    }
-  }
+    deleteAll() {
+      let copy = this.datas;
+      this.datas = [];
+      let dltodo = [];
+      const todos = JSON.parse(localStorage.getItem("todos"));
+      todos.forEach((item) => {
+        if (item.active) {
+          dltodo.push(item);
+        }
+      });
+      localStorage.setItem("todos", JSON.stringify(dltodo));
+      copy.forEach((item) => {
+        if (item.active) {
+          this.datas.push(item);
+        }
+      });
+    },
+  },
 };
 </script>
 
@@ -164,7 +163,7 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
-h1{
+h1 {
   font-family: Raleway;
   font-style: normal;
   font-weight: bold;
@@ -180,7 +179,7 @@ h1{
   width: 600px;
   margin: auto;
 }
-.center{
+.center {
   text-align: center;
 }
 .firstLi {
@@ -194,31 +193,29 @@ h1{
   display: inline-block;
   text-align: center;
 }
-.cizgi {
+.line {
   position: relative;
   width: 600px;
   margin: auto;
   text-align: left;
   height: 0;
 }
-.cizgidiv{
+.linediv {
   position: relative;
   width: 89px;
   height: 5px;
-  background: #6DA6F2;
+  background: #6da6f2;
   border-radius: 4px 4px 0px 0px;
   bottom: 0px;
   transition: 0.8s;
   left: 0px;
 }
-.bos {
+.lineEmptyDiv {
   position: relative;
   width: 600px;
   margin: auto;
   height: 1px;
   margin-top: 5px;
-  background: #BDBDBD;
+  background: #bdbdbd;
 }
-
 </style>
-

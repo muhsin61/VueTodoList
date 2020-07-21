@@ -3,39 +3,38 @@
     <ul>
       <li v-for="item in datas" :key="item.key">
         <div class="container">
-          <input type="checkbox" value="item.id" @change="check(item.key)" :checked="!item.active">
-          <label for="checkbox" v-if="item.active">{{item.todo}}</label>
-          <label v-else for="checkbox" ><del>{{item.todo}}</del></label>
+          <input
+            type="checkbox"
+            value="item.id"
+            @change="check(item.key)"
+            :checked="!item.active"
+          />
+          <label for="checkbox" v-if="item.active">{{ item.todo }}</label>
+          <label v-else for="checkbox">
+            <del>{{ item.todo }}</del>
+          </label>
         </div>
-          
-          </li>
+      </li>
     </ul>
-      
   </div>
 </template>
 
 <script>
 export default {
   name: "All",
-  data: () => {
-    return {
-      mk: "naber"
-    };
-  },
   props: {
     datas: Array,
   },
   methods: {
     check(id) {
-      this.$emit("changeKey",id)
-    }
-  }
+      this.$emit("changeStatus", id);
+    },
+  },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.container{
+.container {
   text-align: left;
   width: 600px;
   position: relative;
@@ -46,14 +45,14 @@ ul {
   padding: 0;
   font-size: 25px;
 }
-input{
-    position: relative;
-    border: none;
-    top: 5px;
-    width: 25px;
-    height: 25px;
+input {
+  position: relative;
+  border: none;
+  top: 5px;
+  width: 25px;
+  height: 25px;
 }
-label{
+label {
   font-family: Montserrat;
   font-style: normal;
   font-weight: 500;
@@ -62,5 +61,4 @@ label{
   color: #000000;
   height: 22px;
 }
-
 </style>
